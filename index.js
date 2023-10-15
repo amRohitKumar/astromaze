@@ -65,8 +65,28 @@ app.post(
     const { answer: num, teamId } = req.body;
     const answer = parseInt(num);
     const reqUser = await User.findById(teamId);
-    if (answer === 1 || answer === 2 || answer === 4) {
-      return res.status(200).send({
+    if (reqUser.response.length === 9) {
+      if (answer === 14 || answer === 28 || answer === 31) {
+        let currDate = new Date();
+        reqUser.response.push({ answer, time: currDate.toString() });
+        await reqUser.save();
+        return res.status(200).send({
+          msg: "Thanks for participating !",
+          isComplete: true,
+        });
+      }
+    }
+    if (
+      answer === 1 ||
+      answer === 2 ||
+      answer === 4 ||
+      answer === 14 ||
+      answer === 28 ||
+      answer === 31 ||
+      answer < 1 ||
+      answer > 33
+    ) {
+      return res.status(400).send({
         msg: "Not a valid answer ! Try again.",
       });
     }
@@ -92,14 +112,14 @@ app.post(
     let currDate = new Date();
     reqUser.response.push({ answer, time: currDate.toString() });
     await reqUser.save();
-
-    const isComplete = reqUser.response.length === 10;
+    const resLen = reqUser.response.length;
+    console.log(resLen, typeof(resLen));
 
     const nextQuestion = await Question.findOne({ questionNumber: answer });
     return res.status(200).send({
       msg: "Answer recorded successfully !",
-      isComplete,
       nxtQuestion: {
+        isComplete: (resLen >= 10),
         imageUrl: nextQuestion?.imageUrl,
         questionNumber: nextQuestion?.questionNumber,
       },
