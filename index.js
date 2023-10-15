@@ -118,8 +118,8 @@ app.post(
     const nextQuestion = await Question.findOne({ questionNumber: answer });
     return res.status(200).send({
       msg: "Answer recorded successfully !",
+      isComplete: (resLen >= 10),
       nxtQuestion: {
-        isComplete: (resLen >= 10),
         imageUrl: nextQuestion?.imageUrl,
         questionNumber: nextQuestion?.questionNumber,
       },
